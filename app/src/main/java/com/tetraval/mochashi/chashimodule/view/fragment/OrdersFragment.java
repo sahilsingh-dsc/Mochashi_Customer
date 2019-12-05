@@ -2,6 +2,7 @@ package com.tetraval.mochashi.chashimodule.view.fragment;
 
 
 import android.app.ProgressDialog;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
@@ -39,6 +40,7 @@ public class OrdersFragment extends Fragment {
     FirebaseFirestore db;
     ProgressDialog progressDialog;
     TextView txtNoOrders;
+    SharedPreferences profile;
 
     public OrdersFragment() {}
 
@@ -59,6 +61,8 @@ public class OrdersFragment extends Fragment {
         chashiOrdersModelList = new ArrayList<>();
         chashiOrdersModelList.clear();
 
+        profile = getActivity().getSharedPreferences("USER_PROFILE", 0);
+
         progressDialog.show();
         fetchOrders();
 
@@ -67,8 +71,9 @@ public class OrdersFragment extends Fragment {
 
     private void fetchOrders(){
 
+
         Query queryOrders = db.collection("chashi_orders");
-        queryOrders.get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+        queryOrders.whereEqualTo("o_customer_uid", profile.getString("p_uid", "")).get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
             @Override
             public void onComplete(@NonNull Task<QuerySnapshot> task) {
                 if (task.isSuccessful()){
