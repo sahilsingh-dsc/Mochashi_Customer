@@ -10,6 +10,8 @@ import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -18,6 +20,7 @@ import android.widget.Toast;
 
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
+import com.google.android.material.textfield.TextInputEditText;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.Query;
@@ -44,6 +47,7 @@ public class HomeFragment extends Fragment {
     private ChashiCategoryAdapter chashiCategoryAdapter;
     private List<ChashiCategoryModel> chashiCategoryModelList;
     FirebaseFirestore db;
+    TextInputEditText txtSearchQuery;
     ProgressDialog progressDialog;
 
     public HomeFragment() {
@@ -79,6 +83,31 @@ public class HomeFragment extends Fragment {
 
         progressDialog.show();
         fetchChashiCategory();
+
+
+        txtSearchQuery = view.findViewById(R.id.txtSearchQuery);
+        txtSearchQuery.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+
+            }
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+                List<ChashiCategoryModel> chashiCategoryModelListNew = new ArrayList<>();
+                for (ChashiCategoryModel chashiCategoryModel : chashiCategoryModelList){
+                    String cat_name = chashiCategoryModel.getC_name().toLowerCase().replace(" ", "");
+                    if (cat_name.contains(s))
+                        chashiCategoryModelListNew.add(chashiCategoryModel);
+                }
+                chashiCategoryAdapter.setfilter(chashiCategoryModelListNew);
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {
+
+            }
+        });
 
         return view;
     }
@@ -117,12 +146,16 @@ public class HomeFragment extends Fragment {
                                             recyclerChashiCategory.setAdapter(chashiCategoryAdapter);
                                             progressDialog.dismiss();
 
+                                        } else {
+                                            progressDialog.dismiss();
                                         }
                                     }
                                 }
                             });
                         }
 
+                    } else {
+                        progressDialog.dismiss();
                     }
                 }else {
                     Toast.makeText(getContext(), "Database Error", Toast.LENGTH_SHORT).show();

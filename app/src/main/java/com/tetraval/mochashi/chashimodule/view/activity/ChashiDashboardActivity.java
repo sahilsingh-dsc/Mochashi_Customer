@@ -105,35 +105,35 @@ public class ChashiDashboardActivity extends AppCompatActivity implements Bottom
     }
 
 
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        getMenuInflater().inflate(R.menu.header_menu, menu);
+//    @Override
+//    public boolean onCreateOptionsMenu(Menu menu) {
+//        getMenuInflater().inflate(R.menu.header_menu, menu);
+//
+//        final MenuItem menuItem = menu.findItem(R.id.menu_cart);
+//
+//        View actionView = MenuItemCompat.getActionView(menuItem);
+//        textCartItemCount = (TextView) actionView.findViewById(R.id.cart_badge);
+//
+//        setupBadge();
+//
+//        actionView.setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View v) {
+//                onOptionsItemSelected(menuItem);
+//            }
+//        });
+//
+//        return true;
+//    }
 
-        final MenuItem menuItem = menu.findItem(R.id.menu_cart);
-
-        View actionView = MenuItemCompat.getActionView(menuItem);
-        textCartItemCount = (TextView) actionView.findViewById(R.id.cart_badge);
-
-        setupBadge();
-
-        actionView.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                onOptionsItemSelected(menuItem);
-            }
-        });
-
-        return true;
-    }
-
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) { switch(item.getItemId()) {
-        case R.id.menu_cart:
-
-            return(true);
-    }
-        return(super.onOptionsItemSelected(item));
-    }
+//    @Override
+//    public boolean onOptionsItemSelected(MenuItem item) { switch(item.getItemId()) {
+//        case R.id.menu_cart:
+//
+//            return(true);
+//    }
+//        return(super.onOptionsItemSelected(item));
+//    }
 
     @Override
     public boolean onNavigationItemSelected(@NonNull MenuItem item) {

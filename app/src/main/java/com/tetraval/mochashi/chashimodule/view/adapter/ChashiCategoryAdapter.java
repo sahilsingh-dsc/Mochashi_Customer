@@ -18,6 +18,7 @@ import com.tetraval.mochashi.R;
 import com.tetraval.mochashi.chashimodule.model.ChashiCategoryModel;
 import com.tetraval.mochashi.chashimodule.view.activity.ChashiActivity;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class ChashiCategoryAdapter extends RecyclerView.Adapter<ChashiCategoryAdapter.ChashiCategoryViewHolder> {
@@ -36,6 +37,13 @@ public class ChashiCategoryAdapter extends RecyclerView.Adapter<ChashiCategoryAd
         View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.chashi_category_list_item, parent, false);
         return new ChashiCategoryViewHolder(view);
     }
+
+    public void setfilter(List<ChashiCategoryModel> newlist) {
+        chashiCategoryModelList = new ArrayList<>();
+        chashiCategoryModelList.addAll(newlist);
+        notifyDataSetChanged();
+    }
+
 
     @Override
     public void onBindViewHolder(@NonNull ChashiCategoryAdapter.ChashiCategoryViewHolder holder, int position) {

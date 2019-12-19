@@ -166,6 +166,7 @@ public class UserActivity extends AppCompatActivity {
         if ((requestCode == PLACE_PICKER_REQ_CODE) && (resultCode == RESULT_OK)) {
             Place place = PingPlacePicker.getPlace(data);
             if (place != null) {
+                tiProfileAddress.setFocusable(true);
                 Toast.makeText(this, ""+place.getAddress(), Toast.LENGTH_SHORT).show();
                 tiProfileAddress.setText(place.getAddress());
                 l_lat = String.valueOf(place.getLatLng().latitude);
