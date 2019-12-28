@@ -6,13 +6,23 @@
     android:layout_height="match_parent"
     android:orientation="vertical"
     android:gravity="center"
-    android:background="@color/colorPrimary"
     tools:context=".genericmodule.view.activity.SplashActivity">
 
     <ImageView
         android:id="@+id/imgSplashLogo"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
+        android:layout_width="300dp"
+        android:layout_height="300dp"
         android:contentDescription="@string/mochashi_logo_desc"
-        android:src="@drawable/mochashi_logo" />
+        android:src="@drawable/logoo" />
+
+    <TextView
+        android:id="@+id/textView"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:fontFamily="@font/architects_daughter"
+        android:gravity="center"
+        android:text="Mochashi"
+        android:textSize="35sp"
+        android:textColor="@color/colorPrimary"
+        android:textStyle="bold" />
 </LinearLayout>

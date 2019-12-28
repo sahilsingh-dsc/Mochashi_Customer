@@ -107,15 +107,16 @@
                         android:id="@+id/textView16"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:textSize="18sp"
-                        android:padding="8dp"
-                        android:drawablePadding="5dp"
                         android:background="?selectableItemBackground"
                         android:clickable="true"
-                        android:drawableEnd="@drawable/ic_chevron_right_black_24dp"
                         android:drawableStart="@drawable/ic_account_balance_wallet_black_24dp"
+                        android:drawableEnd="@drawable/ic_chevron_right_black_24dp"
+                        android:drawablePadding="5dp"
+                        android:padding="8dp"
+                        android:text="Credit Passbook"
                         android:textColor="@color/colorBlack"
-                        android:text="Credit Passbook" />
+                        android:textSize="18sp"
+                        android:visibility="gone" />
 
                     <View
                         android:id="@+id/divider7"
