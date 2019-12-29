@@ -308,7 +308,9 @@ public class ChashiProductDetailsActivity extends AppCompatActivity {
                     return;
                 }
 
-                if (is_ship == min){
+                Toast.makeText(ChashiProductDetailsActivity.this, "is ship :"+is_ship+"  min :"+min, Toast.LENGTH_LONG).show();
+
+                if (is_ship > min  ||  is_ship == min){
                     DialogInterface.OnClickListener dialogClickListener = new DialogInterface.OnClickListener() {
                         @Override
                         public void onClick(DialogInterface dialog, int which) {
@@ -437,10 +439,11 @@ public class ChashiProductDetailsActivity extends AppCompatActivity {
             double final_ship = shipping*customer_chashi_distance*quantity;
             if (final_ship < min){
                 final_ship = min;
-                is_ship = final_ship;
-
+                Toast.makeText(this, ""+final_ship, Toast.LENGTH_SHORT).show();
             }
-            Toast.makeText(this, " :st: "+subtotal+" :ship: "+shipping+" :km: "+customer_chashi_distance+"  :qty:  "+quantity, Toast.LENGTH_SHORT).show();
+            is_ship = final_ship;
+
+//            Toast.makeText(this, " :st: "+subtotal+" :ship: "+shipping+" :km: "+customer_chashi_distance+"  :qty:  "+quantity, Toast.LENGTH_SHORT).show();
             double grandtotal;
             if (homedelivery.equals("No") && pickup_state.equals("No")){
                 txtSubTotal.setText("₹"+subtotal);
@@ -460,9 +463,10 @@ public class ChashiProductDetailsActivity extends AppCompatActivity {
             double final_ship = shipping*customer_chashi_distance*quantity;
             if (final_ship < min){
                 final_ship = min;
-                is_ship = final_ship;
+                Toast.makeText(this, ""+final_ship, Toast.LENGTH_SHORT).show();
             }
-            Toast.makeText(this, " :st: "+subtotal+" :ship: "+shipping+" :km: "+customer_chashi_distance+"  :qty:  "+quantity, Toast.LENGTH_SHORT).show();
+            is_ship = final_ship;
+           // Toast.makeText(this, " :st: "+subtotal+" :ship: "+shipping+" :km: "+customer_chashi_distance+"  :qty:  "+quantity, Toast.LENGTH_SHORT).show();
             double grandtotal;
             if (homedelivery.equals("No") && pickup_state.equals("No")){
                 txtSubTotal.setText("₹"+subtotal);
@@ -513,6 +517,7 @@ public class ChashiProductDetailsActivity extends AppCompatActivity {
         chashiOrdersModel.setP_received_qty("0");
         orderColRef.document(o_uid).set(chashiOrdersModel);
         updateBookedQuantity(p_uid);
+
         if (check_state.equals("Yes")){
             Map map = new HashMap();
             map.put("p_credits", "0");
@@ -520,7 +525,9 @@ public class ChashiProductDetailsActivity extends AppCompatActivity {
             handqQtyCol.document(profile.getString("p_uid", "")).update(map);
         }
         Toast.makeText(this, "Order Placed!", Toast.LENGTH_SHORT).show();
-        onBackPressed();
+        startActivity(new Intent(ChashiProductDetailsActivity.this, ChashiDashboardActivity.class));
+        finish();
+
     }
 
     private void updateBookedQuantity(String p_uid){
@@ -608,7 +615,7 @@ public class ChashiProductDetailsActivity extends AppCompatActivity {
                 DistanceResult = DistanceResult.replaceAll("[^\\d.]", "");
                 double km = Double.parseDouble(DistanceResult);
                 customer_chashi_distance = km;
-                Toast.makeText(ChashiProductDetailsActivity.this, ""+km, Toast.LENGTH_SHORT).show();
+               // Toast.makeText(ChashiProductDetailsActivity.this, ""+km, Toast.LENGTH_SHORT).show();
 
             }
         }

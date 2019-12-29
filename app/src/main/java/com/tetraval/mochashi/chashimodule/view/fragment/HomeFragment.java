@@ -129,17 +129,13 @@ public class HomeFragment extends Fragment {
                                 public void onComplete(@NonNull Task<QuerySnapshot> task) {
                                     if (task.isSuccessful()){
                                         if (task.getResult() != null){
-                                            for (DocumentSnapshot document : task.getResult()){
-                                        //        Toast.makeText(getContext(), ""+document, Toast.LENGTH_SHORT).show();
-                                                if (document.exists()){
-                                                    ChashiCategoryModel chashiCategoryModel = new ChashiCategoryModel(
-                                                            c_document.getString("c_uid"),
-                                                            c_document.getString("c_name"),
-                                                            c_document.getString("c_image")
-                                                    );
-                                                    chashiCategoryModelList.add(chashiCategoryModel);
-                                                //    Toast.makeText(getContext(), "exist", Toast.LENGTH_SHORT).show();
-                                                }
+                                            if (c_document.exists()){
+                                                ChashiCategoryModel chashiCategoryModel = new ChashiCategoryModel(
+                                                        c_document.getString("c_uid"),
+                                                        c_document.getString("c_name"),
+                                                        c_document.getString("c_image")
+                                                );
+                                                chashiCategoryModelList.add(chashiCategoryModel);
                                             }
 
                                             chashiCategoryAdapter = new ChashiCategoryAdapter(getContext(), chashiCategoryModelList);

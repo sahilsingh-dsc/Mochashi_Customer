@@ -8,22 +8,33 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.RatingBar;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.cardview.widget.CardView;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.Task;
+import com.google.firebase.firestore.CollectionReference;
+import com.google.firebase.firestore.DocumentReference;
+import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.Query;
 import com.tetraval.mochashi.R;
 import com.tetraval.mochashi.chashimodule.model.ChashiOrdersModel;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class ChashiOrderAdapter extends RecyclerView.Adapter<ChashiOrderAdapter.ChashiOrderViewHolder> {
 
     Context context;
     List<ChashiOrdersModel> chashiOrdersModelList;
     String expand_state;
+    FirebaseFirestore db;
 
     public ChashiOrderAdapter(Context context, List<ChashiOrdersModel> chashiOrdersModelList) {
         this.context = context;
@@ -34,6 +45,7 @@ public class ChashiOrderAdapter extends RecyclerView.Adapter<ChashiOrderAdapter.
     @Override
     public ChashiOrderAdapter.ChashiOrderViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.orders_list_item, parent, false);
+        db = FirebaseFirestore.getInstance();
         return new ChashiOrderViewHolder(view);
     }
 
@@ -68,6 +80,28 @@ public class ChashiOrderAdapter extends RecyclerView.Adapter<ChashiOrderAdapter.
                 } else if (expand_state.equals("unexpanded")){
                     if (chashiOrdersModel.getO_status().equals("Pending")){
                         holder.txtCancelOrder.setVisibility(View.VISIBLE);
+                        holder.txtCancelOrder.setOnClickListener(new View.OnClickListener() {
+                            @Override
+                            public void onClick(View v) {
+                                Map cancelMap = new HashMap();
+                                cancelMap.put("o_status", "Cancelled");
+                                CollectionReference cancelQuery = db.collection("chashi_orders");
+                                        cancelQuery.document(chashiOrdersModel.getO_uid())
+                                        .update(cancelMap)
+                                        .addOnCompleteListener(new OnCompleteListener() {
+                                            @Override
+                                            public void onComplete(@NonNull Task task) {
+                                                Toast.makeText(context, "Order Cancelled!", Toast.LENGTH_SHORT).show();
+                                            }
+                                        })
+                                        .addOnFailureListener(new OnFailureListener() {
+                                            @Override
+                                            public void onFailure(@NonNull Exception e) {
+                                                Toast.makeText(context, "Something went wrong...", Toast.LENGTH_SHORT).show();
+                                            }
+                                        });
+                            }
+                        });
                     }else if (chashiOrdersModel.getO_status().equals("Confirmed")){
                         holder.txtCancelOrder.setVisibility(View.INVISIBLE);
                     }

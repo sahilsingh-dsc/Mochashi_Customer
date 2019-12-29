@@ -360,6 +360,8 @@
                 android:text="Cancel Order"
                 android:textSize="20sp"
                 android:textStyle="bold"
+                android:background="?selectableItemBackground"
+                android:clickable="true"
                 android:visibility="gone"
                 android:textColor="@color/colorPrimary"
                 app:layout_constraintBottom_toBottomOf="parent"

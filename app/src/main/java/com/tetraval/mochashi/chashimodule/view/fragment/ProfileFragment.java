@@ -61,7 +61,7 @@ public class ProfileFragment extends Fragment {
             public void onComplete(@NonNull Task<DocumentSnapshot> task) {
                 if (task.isSuccessful()){
                     String m_credits = task.getResult().getString("p_credits");
-                    txtCurrentCredits.setText(m_credits);
+                    txtCurrentCredits.setText("₹"+m_credits);
                 }else {
                     Toast.makeText(getContext(), "Database Error", Toast.LENGTH_SHORT).show();
                 }
