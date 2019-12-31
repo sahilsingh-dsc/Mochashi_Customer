@@ -49,7 +49,8 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
 
-public class ChashiProductDetailsActivity extends AppCompatActivity {
+public class
+ChashiProductDetailsActivity extends AppCompatActivity {
 
     ImageView imgMain, img1, img2, img3, img4, imgChashiPhoto;
     TextView txtChashiName, txtChashiLocation, txtChashiRate, txtChashiAvlQuantity, txtSubTotal, txtShippingCharge, txtGrandTotal, txtNoDelivery;
@@ -135,7 +136,7 @@ public class ChashiProductDetailsActivity extends AppCompatActivity {
         img2 = findViewById(R.id.img2);
         img3 = findViewById(R.id.img3);
         img4 = findViewById(R.id.img4);
-        imgChashiPhoto = findViewById(R.id.imgChashiPhoto);
+//        imgChashiPhoto = findViewById(R.id.imgChashiPhoto);
         txtChashiName = findViewById(R.id.txtChashiName);
         txtChashiLocation = findViewById(R.id.txtChashiLocation);
         txtChashiRate = findViewById(R.id.txtChashiRate);
@@ -228,7 +229,7 @@ public class ChashiProductDetailsActivity extends AppCompatActivity {
             public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
                 if (!txtQuantityRequired.getText().toString().isEmpty()){
                     chashi_rate = Double.parseDouble(rate);
-                    quantity = Double.parseDouble(txtQuantityRequired.getText().toString());
+                    quantity = Double.parseDouble("0"+txtQuantityRequired.getText().toString());
                     shipping = Double.parseDouble(shipping_charge);
                     min = Double.parseDouble(min_shipping);
                     doCalculations(homedelivery);
@@ -411,7 +412,7 @@ public class ChashiProductDetailsActivity extends AppCompatActivity {
         Glide.with(getApplicationContext()).load(image2).into(img2);
         Glide.with(getApplicationContext()).load(image3).into(img3);
         Glide.with(getApplicationContext()).load(image4).into(img4);
-        Glide.with(getApplicationContext()).load(chashi_photo).into(imgChashiPhoto);
+//        Glide.with(getApplicationContext()).load(chashi_photo).into(imgChashiPhoto);
         txtChashiName.setText(chashi_name);
         txtChashiLocation.setText(chashi_address);
         ratingBar.setRating(Float.parseFloat(chashi_rating));

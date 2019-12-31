@@ -55,7 +55,7 @@ public class ChashiOrderAdapter extends RecyclerView.Adapter<ChashiOrderAdapter.
         holder.txtOrderStatus.setText(chashiOrdersModel.getO_status());
         holder.txtChashiName.setText(chashiOrdersModel.getO_chashi_name());
         holder.txtChashiLocation.setText(chashiOrdersModel.getO_chashi_address());
-        holder.txtOrderId.setText(chashiOrdersModel.getO_uid());
+//        holder.txtOrderId.setText(chashiOrdersModel.getO_uid());
         holder.txtOrderDate.setText((CharSequence) chashiOrdersModel.getO_timestamp());
         holder.txtOrderCategory.setText(chashiOrdersModel.getO_p_category());
         holder.txtOrderQuantity.setText(chashiOrdersModel.getO_quantity()+" "+chashiOrdersModel.getO_unit());
@@ -135,7 +135,7 @@ public class ChashiOrderAdapter extends RecyclerView.Adapter<ChashiOrderAdapter.
             txtOrderStatus = itemView.findViewById(R.id.txtOrderStatus);
             txtChashiName = itemView.findViewById(R.id.txtChashiName);
             txtChashiLocation = itemView.findViewById(R.id.txtChashiLocation);
-            txtOrderId = itemView.findViewById(R.id.txtOrderId);
+//            txtOrderId = itemView.findViewById(R.id.txtOrderId);
             txtOrderDate = itemView.findViewById(R.id.txtOrderDate);
             txtOrderCategory = itemView.findViewById(R.id.txtOrderCategory);
             txtOrderQuantity = itemView.findViewById(R.id.txtOrderQuantity);
