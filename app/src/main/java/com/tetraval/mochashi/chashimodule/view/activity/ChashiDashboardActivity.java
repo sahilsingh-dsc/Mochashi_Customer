@@ -1,6 +1,7 @@
 package com.tetraval.mochashi.chashimodule.view.activity;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 import androidx.core.view.MenuItemCompat;
@@ -23,8 +24,12 @@ import com.google.android.gms.tasks.Task;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.CollectionReference;
+import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
+import com.google.firebase.firestore.EventListener;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.FirebaseFirestoreException;
+import com.google.firebase.firestore.QuerySnapshot;
 import com.tetraval.mochashi.R;
 import com.tetraval.mochashi.chashimodule.view.fragment.HomeFragment;
 import com.tetraval.mochashi.chashimodule.view.fragment.OrdersFragment;
@@ -37,7 +42,7 @@ public class ChashiDashboardActivity extends AppCompatActivity implements Bottom
 
     BottomNavigationView bottomNavigationView;
     TextView textCartItemCount;
-    int mCartItemCount = 5;
+    int mCartItemCount = 0;
     FirebaseFirestore db;
     FirebaseAuth auth;
     String uid;
@@ -46,7 +51,6 @@ public class ChashiDashboardActivity extends AppCompatActivity implements Bottom
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_chashi_dashboard);
-
 
         bottomNavigationView = findViewById(R.id.bottomNavigationView);
         bottomNavigationView.setOnNavigationItemSelectedListener(ChashiDashboardActivity.this);
@@ -63,8 +67,8 @@ public class ChashiDashboardActivity extends AppCompatActivity implements Bottom
         if (auth.getCurrentUser() != null){
             uid = auth.getCurrentUser().getUid();
             setProfileData();
+            getCartItemCount();
         }
-
     }
 
     boolean doubleBackToExitPressedOnce = false;
@@ -88,7 +92,7 @@ public class ChashiDashboardActivity extends AppCompatActivity implements Bottom
         }, 2000);
     }
 
-    private void setupBadge() {
+    public void setupBadge() {
 
         if (textCartItemCount != null) {
             if (mCartItemCount == 0) {
@@ -105,35 +109,40 @@ public class ChashiDashboardActivity extends AppCompatActivity implements Bottom
     }
 
 
-//    @Override
-//    public boolean onCreateOptionsMenu(Menu menu) {
-//        getMenuInflater().inflate(R.menu.header_menu, menu);
-//
-//        final MenuItem menuItem = menu.findItem(R.id.menu_cart);
-//
-//        View actionView = MenuItemCompat.getActionView(menuItem);
-//        textCartItemCount = (TextView) actionView.findViewById(R.id.cart_badge);
-//
-//        setupBadge();
-//
-//        actionView.setOnClickListener(new View.OnClickListener() {
-//            @Override
-//            public void onClick(View v) {
-//                onOptionsItemSelected(menuItem);
-//            }
-//        });
-//
-//        return true;
-//    }
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.header_menu, menu);
 
-//    @Override
-//    public boolean onOptionsItemSelected(MenuItem item) { switch(item.getItemId()) {
-//        case R.id.menu_cart:
-//
-//            return(true);
-//    }
-//        return(super.onOptionsItemSelected(item));
-//    }
+        final MenuItem menuItem = menu.findItem(R.id.menu_cart);
+
+        View actionView = MenuItemCompat.getActionView(menuItem);
+        textCartItemCount = (TextView) actionView.findViewById(R.id.cart_badge);
+
+        if (auth.getCurrentUser() != null){
+
+            setupBadge();
+
+            actionView.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    onOptionsItemSelected(menuItem);
+                    startActivity(new Intent(ChashiDashboardActivity.this, ChashiCartActivity.class));
+                }
+            });
+
+        }
+
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) { switch(item.getItemId()) {
+        case R.id.menu_cart:
+
+            return(true);
+    }
+        return(super.onOptionsItemSelected(item));
+    }
 
     @Override
     public boolean onNavigationItemSelected(@NonNull MenuItem item) {
@@ -146,11 +155,21 @@ public class ChashiDashboardActivity extends AppCompatActivity implements Bottom
                 break;
 
             case R.id.menu_orders :
-                fragment = new OrdersFragment();
+                if (auth.getCurrentUser() != null){
+                    fragment = new OrdersFragment();
+
+                } else {
+                    startActivity(new Intent(ChashiDashboardActivity.this, MobileActivity.class));
+                }
                 break;
 
             case R.id.menu_profile :
-                fragment = new ProfileFragment();
+                if (auth.getCurrentUser() != null){
+                    fragment = new ProfileFragment();
+
+                } else {
+                    startActivity(new Intent(ChashiDashboardActivity.this, MobileActivity.class));
+                }
                 break;
 
         }
@@ -177,6 +196,21 @@ public class ChashiDashboardActivity extends AppCompatActivity implements Bottom
         finish();
     }
 
+    @Override
+    protected void onResume() {
+        super.onResume();
+        if (auth.getCurrentUser() != null){
+            getCartItemCount();
+        }
+    }
+
+    @Override
+    protected void onStart() {
+        super.onStart();
+        if (auth.getCurrentUser() != null){
+            getCartItemCount();
+        }
+    }
 
     private void setProfileData(){
         CollectionReference profileCol = db.collection("customer_profiles");
@@ -204,6 +238,21 @@ public class ChashiDashboardActivity extends AppCompatActivity implements Bottom
                 }
             }
         });
+    }
+
+    public void getCartItemCount() {
+        FirebaseFirestore database = FirebaseFirestore.getInstance();
+        FirebaseAuth firebaseAuth = FirebaseAuth.getInstance();
+        CollectionReference customerColRef = database.collection("customer_profiles");
+        DocumentReference documentReference = customerColRef.document(firebaseAuth.getCurrentUser().getUid());
+        documentReference.collection("mo_cart")
+                .addSnapshotListener(this, new EventListener<QuerySnapshot>() {
+                    @Override
+                    public void onEvent(@Nullable QuerySnapshot queryDocumentSnapshots, @Nullable FirebaseFirestoreException e) {
+                        mCartItemCount = queryDocumentSnapshots.getDocuments().size();
+                        setupBadge();
+                    }
+                });
     }
 
 }

@@ -70,12 +70,6 @@ public class UserActivity extends AppCompatActivity {
         tiProfileEmail = findViewById(R.id.tiProfileEmail);
         tiProfileAddress = findViewById(R.id.tiProfileAddress);
 
-        tiProfileAddress.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                showPlacePicker();
-            }
-        });
 
         MaterialButton btnUpdateProfile = findViewById(R.id.btnUpdateProfile);
         btnUpdateProfile.setOnClickListener(new View.OnClickListener() {

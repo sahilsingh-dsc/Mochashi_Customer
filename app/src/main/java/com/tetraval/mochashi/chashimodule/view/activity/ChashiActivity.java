@@ -1,6 +1,7 @@
 package com.tetraval.mochashi.chashimodule.view.activity;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 import androidx.core.view.MenuItemCompat;
@@ -9,6 +10,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import android.app.ProgressDialog;
 import android.content.Context;
+import android.content.Intent;
 import android.graphics.Color;
 import android.graphics.PorterDuff;
 import android.os.Bundle;
@@ -23,8 +25,13 @@ import android.widget.Toast;
 
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.firestore.CollectionReference;
+import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
+import com.google.firebase.firestore.EventListener;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.FirebaseFirestoreException;
 import com.google.firebase.firestore.Query;
 import com.google.firebase.firestore.QuerySnapshot;
 import com.tetraval.mochashi.R;
@@ -43,12 +50,13 @@ import static java.security.AccessController.getContext;
 public class ChashiActivity extends AppCompatActivity {
 
     TextView textCartItemCount, txtNoProducts;
-    int mCartItemCount = 5;
+    int mCartItemCount = 0;
     RecyclerView recyclerChashi;
     List<ChashiModel> chashiModelList;
     ChashiAdapter chashiAdapter;
     AutoCompleteTextView txtACSortBy;
     FirebaseFirestore db;
+    FirebaseAuth firebaseAuth;
     ProgressDialog progressDialog;
 
     @Override
@@ -59,6 +67,8 @@ public class ChashiActivity extends AppCompatActivity {
         Bundle bundle = getIntent().getExtras();
         String c_uid = bundle.getString("c_uid");
         String c_name = bundle.getString("c_name");
+
+        firebaseAuth = FirebaseAuth.getInstance();
 
         Toolbar toolbarChashi = findViewById(R.id.toolbarChashi);
         setSupportActionBar(toolbarChashi);
@@ -101,7 +111,40 @@ public class ChashiActivity extends AppCompatActivity {
 
         progressDialog.show();
         fetchChashi(c_name);
+        if (firebaseAuth.getCurrentUser() != null){
+            getCartItemCount();
+        }
+    }
 
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        if (firebaseAuth.getCurrentUser() != null){
+            getCartItemCount();
+        }
+    }
+
+    @Override
+    protected void onStart() {
+        super.onStart();
+        if (firebaseAuth.getCurrentUser() != null){
+            getCartItemCount();
+        }
+    }
+
+
+    private void getCartItemCount() {
+        CollectionReference customerColRef = db.collection("customer_profiles");
+        DocumentReference documentReference = customerColRef.document(firebaseAuth.getCurrentUser().getUid());
+        documentReference.collection("mo_cart")
+                .addSnapshotListener(this, new EventListener<QuerySnapshot>() {
+                    @Override
+                    public void onEvent(@Nullable QuerySnapshot queryDocumentSnapshots, @Nullable FirebaseFirestoreException e) {
+                        mCartItemCount = queryDocumentSnapshots.getDocuments().size();
+                        setupBadge();
+                    }
+                });
     }
 
     private void sortByPriceHL() {
@@ -198,26 +241,31 @@ public class ChashiActivity extends AppCompatActivity {
         }
     }
 
-//    @Override
-//    public boolean onCreateOptionsMenu(Menu menu) {
-//        getMenuInflater().inflate(R.menu.header_menu, menu);
-//
-//        final MenuItem menuItem = menu.findItem(R.id.menu_cart);
-//
-//        View actionView = MenuItemCompat.getActionView(menuItem);
-//        textCartItemCount = (TextView) actionView.findViewById(R.id.cart_badge);
-//
-//        setupBadge();
-//
-//        actionView.setOnClickListener(new View.OnClickListener() {
-//            @Override
-//            public void onClick(View v) {
-//                onOptionsItemSelected(menuItem);
-//            }
-//        });
-//
-//        return true;
-//    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.header_menu, menu);
+
+        final MenuItem menuItem = menu.findItem(R.id.menu_cart);
+
+        View actionView = MenuItemCompat.getActionView(menuItem);
+        textCartItemCount = (TextView) actionView.findViewById(R.id.cart_badge);
+
+        if (firebaseAuth.getCurrentUser() != null){
+            setupBadge();
+
+            actionView.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    onOptionsItemSelected(menuItem);
+                    startActivity(new Intent(ChashiActivity.this, ChashiCartActivity.class));
+                }
+            });
+        }
+
+
+        return true;
+    }
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) { switch(item.getItemId()) {
@@ -227,5 +275,7 @@ public class ChashiActivity extends AppCompatActivity {
     }
         return(super.onOptionsItemSelected(item));
     }
+
+
 
 }

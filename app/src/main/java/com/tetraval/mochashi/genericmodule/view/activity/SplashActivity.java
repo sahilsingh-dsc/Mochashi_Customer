@@ -9,7 +9,9 @@ import android.os.Handler;
 import android.widget.Toast;
 
 import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.Task;
+import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
@@ -39,33 +41,8 @@ public class SplashActivity extends AppCompatActivity {
         new Handler().postDelayed(new Runnable() {
             @Override
             public void run() {
-                if (firebaseAuth.getCurrentUser() != null){
-                    String uid = firebaseAuth.getCurrentUser().getUid();
-                    DocumentReference profileRef = db.collection("customer_profiles").document(uid);
-                    profileRef.get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
-                        @Override
-                        public void onComplete(@NonNull Task<DocumentSnapshot> task) {
-                            if (task.isSuccessful()){
-                                DocumentSnapshot document = task.getResult();
-                                if (document.exists()){
-                                    startActivity(new Intent(getApplicationContext(), ChashiDashboardActivity.class));
-                                    finish();
-                                }else {
-                                    startActivity(new Intent(getApplicationContext(), UserActivity.class));
-                                    finish();
-                                }
-                            } else {
-                                Toast.makeText(SplashActivity.this, "database error (otp->profile)", Toast.LENGTH_SHORT).show();
-                            }
-                        }
-                    });
-//                    startActivity(new Intent(getApplicationContext(), UserActivity.class));
-//                    finish();
-                }else {
-                    startActivity(new Intent(getApplicationContext(), MobileActivity.class));
-                    finish();
-                }
-
+                startActivity(new Intent(getApplicationContext(), ChashiDashboardActivity.class));
+                finish();
             }
         }, SPLASH_DEALY);
 

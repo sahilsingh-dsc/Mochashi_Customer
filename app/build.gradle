@@ -60,5 +60,4 @@ dependencies {
     implementation 'com.github.rtchagas:pingplacepicker:1.1.5'
 
 
-
 }

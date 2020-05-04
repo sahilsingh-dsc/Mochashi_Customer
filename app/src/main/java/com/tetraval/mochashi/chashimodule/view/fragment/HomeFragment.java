@@ -32,6 +32,7 @@ import com.tetraval.mochashi.R;
 import com.tetraval.mochashi.chashimodule.model.ChashiCategoryModel;
 import com.tetraval.mochashi.chashimodule.model.ChashiModel;
 import com.tetraval.mochashi.chashimodule.view.activity.ChashiActivity;
+import com.tetraval.mochashi.chashimodule.view.activity.ChashiDashboardActivity;
 import com.tetraval.mochashi.chashimodule.view.adapter.ChashiAdapter;
 import com.tetraval.mochashi.chashimodule.view.adapter.ChashiCategoryAdapter;
 import com.tetraval.mochashi.genericmodule.view.adapter.SliderAdapterExample;
@@ -84,6 +85,8 @@ public class HomeFragment extends Fragment {
         progressDialog.show();
         fetchChashiCategory();
 
+//        new ChashiDashboardActivity().getCartItemCount();
+//        new ChashiDashboardActivity().setupBadge();
 
         txtSearchQuery = view.findViewById(R.id.txtSearchQuery);
         txtSearchQuery.addTextChangedListener(new TextWatcher() {
@@ -128,8 +131,9 @@ public class HomeFragment extends Fragment {
                                 @Override
                                 public void onComplete(@NonNull Task<QuerySnapshot> task) {
                                     if (task.isSuccessful()){
-                                        if (task.getResult() != null){
+                                        if (!task.getResult().getDocuments().isEmpty()){
                                             if (c_document.exists()){
+                                                Log.e("cat", c_document.toString() );
                                                 ChashiCategoryModel chashiCategoryModel = new ChashiCategoryModel(
                                                         c_document.getString("c_uid"),
                                                         c_document.getString("c_name"),
