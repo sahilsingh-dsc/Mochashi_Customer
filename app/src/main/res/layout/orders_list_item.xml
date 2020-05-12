@@ -221,27 +221,6 @@
                 android:layout_height="1dp"
                 android:background="?android:attr/listDivider" />
 
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="horizontal"
-                android:padding="8dp">
-
-                <TextView
-                    android:id="@+id/textView6"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:text="Shipping Charges:"
-                    android:textColor="@color/colorBlack" />
-
-                <TextView
-                    android:id="@+id/txtOrderShipping"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="Rs. 20" />
-            </LinearLayout>
-
             <View
                 android:id="@+id/divider2"
                 android:layout_width="match_parent"
@@ -259,7 +238,7 @@
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
-                    android:text="Grand Total:"
+                    android:text="Total:"
                     android:textColor="@color/colorBlack"
                     android:textStyle="bold" />
 

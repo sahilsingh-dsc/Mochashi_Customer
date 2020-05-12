@@ -57,7 +57,9 @@ import com.tetraval.mochashi.genericmodule.view.activity.authmodule.MobileActivi
 import org.json.JSONArray;
 import org.json.JSONObject;
 
+import java.text.DateFormat;
 import java.text.SimpleDateFormat;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
@@ -244,43 +246,7 @@ ChashiProductDetailsActivity extends AppCompatActivity implements View.OnClickLi
 
     }
 
-    private void placeOrder(String p_uid, String p_category, String customer_uid, String customer_name, String customer_address, String chashi_uid, String chashi_name, String chashi_photo, String chashi_address, String chashi_rating, String rate, String quantity_req, String shipping_final, String total_final, String homedelivery, String pickup_state, String chashi_unit, String customer_lat, String customer_long){
-        SimpleDateFormat formatter = new SimpleDateFormat("dd-MM-yyyy HH:mm:ss");
-        Date date = new Date();
-        CollectionReference orderColRef = db.collection("chashi_orders");
-        DocumentReference orderDocRef = orderColRef.document();
-        String o_uid = orderDocRef.getId();
-        ChashiOrdersModel chashiOrdersModel = new ChashiOrdersModel();
-        chashiOrdersModel.setO_timestamp(formatter.format(date).toString());
-        chashiOrdersModel.setO_uid(o_uid);
-        chashiOrdersModel.setO_p_uid(p_uid);
-        chashiOrdersModel.setO_p_category(p_category);
-        chashiOrdersModel.setO_customer_uid(customer_uid);
-        chashiOrdersModel.setO_customer_name(customer_name);
-        chashiOrdersModel.setO_customer_address(customer_address);
-        chashiOrdersModel.setO_chashi_uid(chashi_uid);
-        chashiOrdersModel.setO_chashi_name(chashi_name);
-        chashiOrdersModel.setO_chashi_photo(chashi_photo);
-        chashiOrdersModel.setO_chashi_address(chashi_address);
-        chashiOrdersModel.setO_chashi_rating(chashi_rating);
-        chashiOrdersModel.setO_rate(rate);
-        chashiOrdersModel.setO_quantity(String.valueOf(quantity));
-        chashiOrdersModel.setO_shipping(shipping_final);
-        chashiOrdersModel.setO_total(total_final);
-        chashiOrdersModel.setO_homedelivery(homedelivery);
-        chashiOrdersModel.setO_pickup(pickup_state);
-        chashiOrdersModel.setO_status("Pending");
-        chashiOrdersModel.setO_unit(chashi_unit);
-        chashiOrdersModel.setO_lat(customer_lat);
-        chashiOrdersModel.setO_long(customer_long);
-        chashiOrdersModel.setP_delivery_status("0");
-        chashiOrdersModel.setP_received_qty("0");
-        orderColRef.document(o_uid).set(chashiOrdersModel);
-        updateBookedQuantity(p_uid);
 
-        Toast.makeText(this, "Added To Cart!", Toast.LENGTH_SHORT).show();
-
-    }
 
     private void updateBookedQuantity(String p_uid){
         double bqty = current_bqty+quantity;
@@ -300,82 +266,130 @@ ChashiProductDetailsActivity extends AppCompatActivity implements View.OnClickLi
     }
 
     private void doAddToCart() {
-        if (firebaseAuth.getCurrentUser() != null){
-            CollectionReference customerColRef = db.collection("customer_profiles");
-            DocumentReference customerDocRef = customerColRef.document();
-            String order_id = customerDocRef.getId();
-            Toast.makeText(this, ""+order_id, Toast.LENGTH_SHORT).show();
-            ChashiOrder chashiOrder = new ChashiOrder();
+        FirebaseFirestore firestore = FirebaseFirestore.getInstance();
+        firestore.collection("chashi_products")
+                .document(bundle.getString("p_uid"))
+                .get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
+            @Override
+            public void onComplete(@NonNull Task<DocumentSnapshot> task) {
+                if (task.isSuccessful()){
+                    String h_qty = task.getResult().getString("p_hquantity");
+                    String b_qty = task.getResult().getString("p_bquantity");
 
-            chashiOrder.setOrder_id(order_id);
-            chashiOrder.setOrder_product(bundle.getString("p_category"));
-            chashiOrder.setOrder_product_image(bundle.getString("image1"));
-            chashiOrder.setOrder_quantity(txtQuantityRequired.getText().toString());
-            chashiOrder.setOrder_rate(bundle.getString("rate"));
-            chashiOrder.setOrder_shipping("10");
-            chashiOrder.setOrder_pickup_address("no address");
-            chashiOrder.setOrder_delivery_address("no address");
-            chashiOrder.setOrder_chashi_name(bundle.getString("chashi_name"));
-            chashiOrder.setOrder_chashi_id(bundle.getString("chashi_uid"));
-            chashiOrder.setOrder_chashi_amount(txtSubTotal.getText().toString());
-            chashiOrder.setOrder_customer_name("Sahil Singh");
-            chashiOrder.setOrder_customer_id(firebaseAuth.getCurrentUser().getUid());
-            chashiOrder.setOrder_chashi_amount(txtSubTotal.getText().toString());
-            chashiOrder.setOrder_status("pending");
+                    double hh_qty = Double.parseDouble(h_qty);
+                    double bb_qty = Double.parseDouble(b_qty);
 
-            customerDocRef = customerColRef.document(firebaseAuth.getCurrentUser().getUid());
+                    double avl_qty = hh_qty - bb_qty;
+                   // Toast.makeText(ChashiProductDetailsActivity.this, ""+avl_qty, Toast.LENGTH_SHORT).show();
 
-            customerDocRef.collection("mo_cart")
-                    .document(order_id)
-                    .set(chashiOrder)
-                    .addOnCompleteListener(new OnCompleteListener<Void>() {
-                        @Override
-                        public void onComplete(@NonNull Task<Void> task) {
-                            if (task.isSuccessful()){
-                                progressDialog.dismiss();
-                                btnBookOrder.setText("Added to Cart");
-                                getCartItemCount();
-                                setupBadge();
-                                new MaterialAlertDialogBuilder(ChashiProductDetailsActivity.this)
-                                        .setTitle("Added To Cart")
-                                        .setMessage("Your product added to cart now you can either checkout or continue to shop more.")
-                                        .setPositiveButton("Continue Shopping", new DialogInterface.OnClickListener() {
-                                            @Override
-                                            public void onClick(DialogInterface dialog, int which) {
-                                                dialog.dismiss();
-                                                startActivity(new Intent(ChashiProductDetailsActivity.this, ChashiDashboardActivity.class));
-                                                finish();
-                                            }
-                                        })
-                                        .setNegativeButton("Checkout", new DialogInterface.OnClickListener() {
-                                            @Override
-                                            public void onClick(DialogInterface dialog, int which) {
-                                                dialog.dismiss();
-                                                startActivity(new Intent(ChashiProductDetailsActivity.this, ChashiCartActivity.class));
-                                                finish();
-                                            }
-                                        })
-                                        .setCancelable(false)
-                                        .show();
+                    if (avl_qty != 0){
+                        String req = txtQuantityRequired.getText().toString();
+                        double req_qty = Double.parseDouble(req);
+                        if (req_qty != 0) {
+                            if (req_qty <= avl_qty) {
+
+                                if (firebaseAuth.getCurrentUser() != null) {
+                                    CollectionReference customerColRef = db.collection("customer_profiles");
+                                    DocumentReference customerDocRef = customerColRef.document();
+                                    String order_id = customerDocRef.getId();
+                                    ChashiOrder chashiOrder = new ChashiOrder();
+
+                                    DateFormat df = new SimpleDateFormat("dd-MM-yyyy h:mm a");
+                                    String date = df.format(Calendar.getInstance().getTime());
+
+                                    chashiOrder.setOrder_date_time(date);
+                                    chashiOrder.setOrder_id(order_id);
+                                    chashiOrder.setOrder_product_id(bundle.getString("p_uid"));
+                                    chashiOrder.setOrder_product(bundle.getString("p_category"));
+                                    chashiOrder.setOrder_product_image(bundle.getString("image1"));
+                                    chashiOrder.setOrder_quantity(txtQuantityRequired.getText().toString());
+                                    chashiOrder.setOrder_rate(bundle.getString("rate"));
+                                    chashiOrder.setOrder_shipping("10");
+                                    chashiOrder.setOrder_pickup_address("no address");
+                                    chashiOrder.setOrder_delivery_address("no address");
+                                    chashiOrder.setOrder_chashi_name(bundle.getString("chashi_name"));
+                                    chashiOrder.setOrder_chashi_id(bundle.getString("chashi_uid"));
+                                    chashiOrder.setOrder_chashi_amount(txtSubTotal.getText().toString());
+                                    chashiOrder.setOrder_customer_name("Sahil Singh");
+                                    chashiOrder.setOrder_customer_id(firebaseAuth.getCurrentUser().getUid());
+                                    chashiOrder.setOrder_chashi_amount(txtSubTotal.getText().toString());
+                                    chashiOrder.setOrder_status("Pending");
+
+                                    customerDocRef = customerColRef.document(firebaseAuth.getCurrentUser().getUid());
+
+                                    customerDocRef.collection("mo_cart")
+                                            .document(order_id)
+                                            .set(chashiOrder)
+                                            .addOnCompleteListener(new OnCompleteListener<Void>() {
+                                                @Override
+                                                public void onComplete(@NonNull Task<Void> task) {
+                                                    if (task.isSuccessful()) {
+                                                        progressDialog.dismiss();
+                                                        btnBookOrder.setText("Added to Cart");
+                                                        getCartItemCount();
+                                                        setupBadge();
+                                                        new MaterialAlertDialogBuilder(ChashiProductDetailsActivity.this)
+                                                                .setTitle("Added To Cart")
+                                                                .setMessage("Your product added to cart now you can either checkout or continue to shop more.")
+                                                                .setPositiveButton("Continue Shopping", new DialogInterface.OnClickListener() {
+                                                                    @Override
+                                                                    public void onClick(DialogInterface dialog, int which) {
+                                                                        dialog.dismiss();
+                                                                        startActivity(new Intent(ChashiProductDetailsActivity.this, ChashiDashboardActivity.class));
+                                                                        finish();
+                                                                    }
+                                                                })
+                                                                .setNegativeButton("Checkout", new DialogInterface.OnClickListener() {
+                                                                    @Override
+                                                                    public void onClick(DialogInterface dialog, int which) {
+                                                                        dialog.dismiss();
+                                                                        startActivity(new Intent(ChashiProductDetailsActivity.this, ChashiCartActivity.class));
+                                                                        finish();
+                                                                    }
+                                                                })
+                                                                .setCancelable(false)
+                                                                .show();
+
+
+                                                    } else {
+                                                        progressDialog.dismiss();
+                                                        Toast.makeText(ChashiProductDetailsActivity.this, "Something went wrong...", Toast.LENGTH_SHORT).show();
+                                                    }
+                                                }
+                                            })
+                                            .addOnFailureListener(new OnFailureListener() {
+                                                @Override
+                                                public void onFailure(@NonNull Exception e) {
+                                                    progressDialog.dismiss();
+                                                    Toast.makeText(ChashiProductDetailsActivity.this, "Database Error", Toast.LENGTH_SHORT).show();
+                                                }
+                                            });
+                                } else {
+                                    progressDialog.dismiss();
+                                    startActivity(new Intent(ChashiProductDetailsActivity.this, MobileActivity.class));
+                                }
 
 
                             } else {
                                 progressDialog.dismiss();
-                                Toast.makeText(ChashiProductDetailsActivity.this, "Something went wrong...", Toast.LENGTH_SHORT).show();
+                                txtQuantityRequired.setError("Order quantity cannot be more then: " + avl_qty + "kg");
                             }
-                        }
-                    })
-                    .addOnFailureListener(new OnFailureListener() {
-                        @Override
-                        public void onFailure(@NonNull Exception e) {
+
+                        } else {
                             progressDialog.dismiss();
-                            Toast.makeText(ChashiProductDetailsActivity.this, "Database Error", Toast.LENGTH_SHORT).show();
+                            txtQuantityRequired.setError("Order quantity cannot be 0");
                         }
-                    });
-        } else {
-            progressDialog.dismiss();
-            startActivity(new Intent(ChashiProductDetailsActivity.this, MobileActivity.class));
-        }
+
+                    } else {
+                        progressDialog.dismiss();
+                        Toast.makeText(ChashiProductDetailsActivity.this, "Out Of Stock", Toast.LENGTH_SHORT).show();
+                    }
+
+                }
+
+            }
+        });
+
     }
 
     private void getCartItemCount() {

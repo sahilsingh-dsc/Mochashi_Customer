@@ -231,7 +231,7 @@ public class ChashiDashboardActivity extends AppCompatActivity implements Bottom
                         editor.putString("p_uid", document.getString("p_uid"));
                         editor.apply();
                     } else {
-                        Toast.makeText(ChashiDashboardActivity.this, "No Data Found", Toast.LENGTH_SHORT).show();
+                       // Toast.makeText(ChashiDashboardActivity.this, "No Data Found", Toast.LENGTH_SHORT).show();
                     }
                 } else {
                     Toast.makeText(ChashiDashboardActivity.this, "Database Error", Toast.LENGTH_SHORT).show();

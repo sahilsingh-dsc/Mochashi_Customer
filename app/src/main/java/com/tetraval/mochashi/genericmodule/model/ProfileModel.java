@@ -13,6 +13,7 @@ public class ProfileModel {
     String p_uid;
     String p_nickname;
     String p_email;
+    String p_area;
     String p_address;
     String p_lat;
     String p_long;
@@ -23,11 +24,12 @@ public class ProfileModel {
     public ProfileModel() {
     }
 
-    public ProfileModel(Date p_timestamp, String p_uid, String p_nickname, String p_email, String p_address, String p_lat, String p_long, String p_credits, String p_active) {
+    public ProfileModel(Date p_timestamp, String p_uid, String p_nickname, String p_email, String p_area, String p_address, String p_lat, String p_long, String p_credits, String p_active) {
         this.p_timestamp = p_timestamp;
         this.p_uid = p_uid;
         this.p_nickname = p_nickname;
         this.p_email = p_email;
+        this.p_area = p_area;
         this.p_address = p_address;
         this.p_lat = p_lat;
         this.p_long = p_long;
@@ -65,6 +67,14 @@ public class ProfileModel {
 
     public void setP_email(String p_email) {
         this.p_email = p_email;
+    }
+
+    public String getP_area() {
+        return p_area;
+    }
+
+    public void setP_area(String p_area) {
+        this.p_area = p_area;
     }
 
     public String getP_address() {

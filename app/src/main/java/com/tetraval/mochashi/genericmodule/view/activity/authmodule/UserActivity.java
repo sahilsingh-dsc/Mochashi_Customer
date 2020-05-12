@@ -6,6 +6,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 
 import android.annotation.SuppressLint;
+import android.content.Context;
 import android.content.Intent;
 import android.graphics.Color;
 import android.graphics.PorterDuff;
@@ -13,6 +14,9 @@ import android.os.Bundle;
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.View;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
+import android.widget.Spinner;
 import android.widget.Toast;
 
 import com.google.android.gms.tasks.OnFailureListener;
@@ -41,6 +45,10 @@ public class UserActivity extends AppCompatActivity {
     FirebaseFirestore db;
     FirebaseAuth firebaseAuth;
     String l_lat, l_long, l_address;
+    Spinner spinner;
+    String area_selected;
+
+    String[] AREA = {"Angul Town", "Talcher Town", "Sambalpur Town", "Paradeep Port"};
 
     private static final int PLACE_PICKER_REQ_CODE = 1;
 
@@ -65,6 +73,23 @@ public class UserActivity extends AppCompatActivity {
         db = FirebaseFirestore.getInstance();
         firebaseAuth = FirebaseAuth.getInstance();
         final String p_uid = firebaseAuth.getCurrentUser().getUid();
+
+        spinner = findViewById(R.id.spinner);
+        ArrayAdapter arrayAdapter = new ArrayAdapter<String>(this, R.layout.support_simple_spinner_dropdown_item, AREA);
+        spinner.setAdapter(arrayAdapter);
+
+        spinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                area_selected = parent.getItemAtPosition(position).toString();
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> parent) {
+
+            }
+        });
+
 
         tiNickName = findViewById(R.id.tiNickName);
         tiProfileEmail = findViewById(R.id.tiProfileEmail);
@@ -119,6 +144,7 @@ public class UserActivity extends AppCompatActivity {
         profileModel.setP_email(p_email);
         profileModel.setP_address(p_address);
         profileModel.setP_lat(l_lat);
+        profileModel.setP_area(area_selected);
         profileModel.setP_long(l_long);
         profileModel.setP_credits("0");
         profileModel.setP_active("active");

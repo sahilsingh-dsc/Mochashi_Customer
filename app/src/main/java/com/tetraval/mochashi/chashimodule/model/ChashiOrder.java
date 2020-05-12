@@ -9,7 +9,9 @@ import java.util.Date;
 public class ChashiOrder {
     @ServerTimestamp
     private Date order_timestamp;
+    private String order_date_time;
     private String order_id;
+    private String order_product_id;
     private String order_product;
     private String order_product_image;
     private String order_quantity;
@@ -32,9 +34,11 @@ public class ChashiOrder {
     public ChashiOrder() {
     }
 
-    public ChashiOrder(Date order_timestamp, String order_id, String order_product, String order_product_image, String order_quantity, String order_rate, String order_shipping, String order_pickup_address, String order_delivery_address, String order_chashi_name, String order_chashi_id, String order_chashi_amount, String order_customer_name, String order_customer_id, String order_customer_amount, String order_status) {
+    public ChashiOrder(Date order_timestamp, String order_date_time, String order_id, String order_product_id, String order_product, String order_product_image, String order_quantity, String order_rate, String order_shipping, String order_pickup_address, String order_delivery_address, String order_chashi_name, String order_chashi_id, String order_chashi_amount, String order_customer_name, String order_customer_id, String order_customer_amount, String order_status) {
         this.order_timestamp = order_timestamp;
+        this.order_date_time = order_date_time;
         this.order_id = order_id;
+        this.order_product_id = order_product_id;
         this.order_product = order_product;
         this.order_product_image = order_product_image;
         this.order_quantity = order_quantity;
@@ -59,12 +63,28 @@ public class ChashiOrder {
         this.order_timestamp = order_timestamp;
     }
 
+    public String getOrder_date_time() {
+        return order_date_time;
+    }
+
+    public void setOrder_date_time(String order_date_time) {
+        this.order_date_time = order_date_time;
+    }
+
     public String getOrder_id() {
         return order_id;
     }
 
     public void setOrder_id(String order_id) {
         this.order_id = order_id;
+    }
+
+    public String getOrder_product_id() {
+        return order_product_id;
+    }
+
+    public void setOrder_product_id(String order_product_id) {
+        this.order_product_id = order_product_id;
     }
 
     public String getOrder_product() {

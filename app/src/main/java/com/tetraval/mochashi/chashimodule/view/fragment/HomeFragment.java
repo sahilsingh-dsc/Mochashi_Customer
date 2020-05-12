@@ -44,9 +44,9 @@ import static com.android.volley.VolleyLog.TAG;
 
 public class HomeFragment extends Fragment {
 
-    private RecyclerView recyclerChashiCategory;
-    private ChashiCategoryAdapter chashiCategoryAdapter;
-    private List<ChashiCategoryModel> chashiCategoryModelList;
+    RecyclerView recyclerChashiCategory;
+    ChashiCategoryAdapter chashiCategoryAdapter;
+    List<ChashiCategoryModel> chashiCategoryModelList;
     FirebaseFirestore db;
     TextInputEditText txtSearchQuery;
     ProgressDialog progressDialog;
@@ -97,22 +97,39 @@ public class HomeFragment extends Fragment {
 
             @Override
             public void onTextChanged(CharSequence s, int start, int before, int count) {
-                List<ChashiCategoryModel> chashiCategoryModelListNew = new ArrayList<>();
-                for (ChashiCategoryModel chashiCategoryModel : chashiCategoryModelList){
-                    String cat_name = chashiCategoryModel.getC_name().toLowerCase().replace(" ", "");
-                    if (cat_name.contains(s))
-                        chashiCategoryModelListNew.add(chashiCategoryModel);
-                }
-                chashiCategoryAdapter.setfilter(chashiCategoryModelListNew);
+//                List<ChashiCategoryModel> chashiCategoryModelListNew = new ArrayList<>();
+//                for (ChashiCategoryModel chashiCategoryModel : chashiCategoryModelList){
+//                    String cat_name = chashiCategoryModel.getC_name().toLowerCase().replace(" ", "");
+//                    if (cat_name.contains(s)) {
+//                        Toast.makeText(getContext(), ""+s, Toast.LENGTH_SHORT).show();
+//                        chashiCategoryModelListNew.add(chashiCategoryModel);
+//                    }
+//                }
+//                chashiCategoryAdapter.setfilter(chashiCategoryModelListNew);
+
+
             }
 
             @Override
             public void afterTextChanged(Editable s) {
-
+                filter(s.toString());
             }
         });
 
         return view;
+    }
+
+    void filter(String text){
+        List<ChashiCategoryModel> temp = new ArrayList();
+        for(ChashiCategoryModel d: chashiCategoryModelList){
+            //or use .equal(text) with you want equal match
+            //use .toLowerCase() for better matches
+            if(d.getC_name().contains(text)){
+                temp.add(d);
+            }
+        }
+        //update recyclerview
+        chashiCategoryAdapter.updateList(temp);
     }
 
     private void fetchChashiCategory(){

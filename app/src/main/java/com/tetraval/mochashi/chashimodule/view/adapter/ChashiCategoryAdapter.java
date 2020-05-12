@@ -38,9 +38,14 @@ public class ChashiCategoryAdapter extends RecyclerView.Adapter<ChashiCategoryAd
         return new ChashiCategoryViewHolder(view);
     }
 
-    public void setfilter(List<ChashiCategoryModel> newlist) {
-        chashiCategoryModelList = new ArrayList<>();
-        chashiCategoryModelList.addAll(newlist);
+//    public void setfilter(List<ChashiCategoryModel> newlist) {
+//        chashiCategoryModelList = new ArrayList<>();
+//        chashiCategoryModelList.addAll(newlist);
+//        notifyDataSetChanged();
+//    }
+
+    public void updateList(List<ChashiCategoryModel> list){
+        chashiCategoryModelList = list;
         notifyDataSetChanged();
     }
 

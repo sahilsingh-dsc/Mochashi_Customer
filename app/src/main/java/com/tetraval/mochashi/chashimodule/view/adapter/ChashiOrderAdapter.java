@@ -54,17 +54,13 @@ public class ChashiOrderAdapter extends RecyclerView.Adapter<ChashiOrderAdapter.
         final ChashiOrdersModel chashiOrdersModel = chashiOrdersModelList.get(position);
         holder.txtOrderStatus.setText(chashiOrdersModel.getO_status());
         holder.txtChashiName.setText(chashiOrdersModel.getO_chashi_name());
-        holder.txtChashiLocation.setText(chashiOrdersModel.getO_chashi_address());
 //        holder.txtOrderId.setText(chashiOrdersModel.getO_uid());
-        holder.txtOrderDate.setText((CharSequence) chashiOrdersModel.getO_timestamp());
         holder.txtOrderCategory.setText(chashiOrdersModel.getO_p_category());
-        holder.txtOrderQuantity.setText(chashiOrdersModel.getO_quantity()+" "+chashiOrdersModel.getO_unit());
-        holder.txtOrderRate.setText(chashiOrdersModel.getO_rate()+"/"+chashiOrdersModel.getO_unit());
-        holder.txtOrderShipping.setText("₹"+chashiOrdersModel.getO_shipping());
-        holder.txtOrderTotal.setText("₹"+chashiOrdersModel.getO_total());
+        holder.txtOrderQuantity.setText(chashiOrdersModel.getO_quantity()+"kg");
+        holder.txtOrderRate.setText(chashiOrdersModel.getO_rate()+"/kg");
         holder.txtProductCategory.setText(chashiOrdersModel.getO_p_category());
-        holder.txtOrderProductTotal.setText("₹"+chashiOrdersModel.getO_total());
-        holder.ratingBar.setRating(Float.parseFloat(chashiOrdersModel.getO_chashi_rating()));
+        holder.txtOrderProductTotal.setText(chashiOrdersModel.getO_total());
+        holder.txtOrderTotal.setText(chashiOrdersModel.getO_total());
         Glide.with(context).load(chashiOrdersModel.getO_chashi_photo()).into(holder.imgChashiPhoto);
         expand_state = "unexpanded";
 
@@ -84,20 +80,21 @@ public class ChashiOrderAdapter extends RecyclerView.Adapter<ChashiOrderAdapter.
                             @Override
                             public void onClick(View v) {
                                 Map cancelMap = new HashMap();
-                                cancelMap.put("o_status", "Cancelled");
-                                CollectionReference cancelQuery = db.collection("chashi_orders");
+                                cancelMap.put("order_status", "Cancelled");
+                                CollectionReference cancelQuery = db.collection("mo_orders");
                                         cancelQuery.document(chashiOrdersModel.getO_uid())
                                         .update(cancelMap)
                                         .addOnCompleteListener(new OnCompleteListener() {
                                             @Override
                                             public void onComplete(@NonNull Task task) {
+                                                holder.txtOrderStatus.setText("Cancelled");
                                                 Toast.makeText(context, "Order Cancelled!", Toast.LENGTH_SHORT).show();
                                             }
                                         })
                                         .addOnFailureListener(new OnFailureListener() {
                                             @Override
                                             public void onFailure(@NonNull Exception e) {
-                                                Toast.makeText(context, "Something went wrong...", Toast.LENGTH_SHORT).show();
+                                                Toast.makeText(context, "Something went wrong..."+e.getMessage(), Toast.LENGTH_SHORT).show();
                                             }
                                         });
                             }
@@ -122,9 +119,8 @@ public class ChashiOrderAdapter extends RecyclerView.Adapter<ChashiOrderAdapter.
 
     public class ChashiOrderViewHolder extends RecyclerView.ViewHolder {
 
-        TextView txtOrderStatus, txtChashiName, txtChashiLocation, txtOrderId, txtOrderDate, txtOrderCategory, txtCancelOrder;
-        TextView txtOrderQuantity, txtOrderRate, txtOrderShipping, txtOrderTotal, txtProductCategory, txtOrderProductTotal;
-        RatingBar ratingBar;
+        TextView txtOrderStatus, txtChashiName, txtOrderId, txtOrderDate, txtOrderCategory, txtCancelOrder, txtOrderTotal;
+        TextView txtOrderQuantity, txtOrderRate, txtProductCategory, txtOrderProductTotal;
         ImageView imgChashiPhoto, imgExpand;
         CardView cardView;
         LinearLayout lvExpandBar;
@@ -133,18 +129,15 @@ public class ChashiOrderAdapter extends RecyclerView.Adapter<ChashiOrderAdapter.
             super(itemView);
 
             txtOrderStatus = itemView.findViewById(R.id.txtOrderStatus);
+            txtOrderTotal = itemView.findViewById(R.id.txtOrderTotal);
             txtChashiName = itemView.findViewById(R.id.txtChashiName);
-            txtChashiLocation = itemView.findViewById(R.id.txtChashiLocation);
 //            txtOrderId = itemView.findViewById(R.id.txtOrderId);
             txtOrderDate = itemView.findViewById(R.id.txtOrderDate);
             txtOrderCategory = itemView.findViewById(R.id.txtOrderCategory);
             txtOrderQuantity = itemView.findViewById(R.id.txtOrderQuantity);
             txtOrderRate = itemView.findViewById(R.id.txtOrderRate);
-            txtOrderShipping = itemView.findViewById(R.id.txtOrderShipping);
-            txtOrderTotal = itemView.findViewById(R.id.txtOrderTotal);
             txtProductCategory = itemView.findViewById(R.id.txtProductCategory);
             txtOrderProductTotal = itemView.findViewById(R.id.txtOrderProductTotal);
-            ratingBar = itemView.findViewById(R.id.ratingBar);
             imgChashiPhoto = itemView.findViewById(R.id.imgChashiPhoto);
             imgExpand = itemView.findViewById(R.id.imgExpand);
             cardView = itemView.findViewById(R.id.cardView);

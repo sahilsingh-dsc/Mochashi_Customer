@@ -4,23 +4,21 @@ package com.tetraval.mochashi.chashimodule.view.fragment;
 import android.app.ProgressDialog;
 import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.ViewGroup;
+import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
-import androidx.cardview.widget.CardView;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import android.view.LayoutInflater;
-import android.view.View;
-import android.view.ViewGroup;
-import android.widget.ImageView;
-import android.widget.LinearLayout;
-import android.widget.TextView;
-import android.widget.Toast;
-
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.Query;
@@ -41,8 +39,15 @@ public class OrdersFragment extends Fragment {
     ProgressDialog progressDialog;
     TextView txtNoOrders;
     SharedPreferences profile;
+    FirebaseAuth firebaseAuth;
 
-    public OrdersFragment() {}
+    private int limit = 10;
+    private DocumentSnapshot lastVisible;
+    private boolean isScrolling = false;
+    private boolean isLastItemReached = false;
+
+    public OrdersFragment() {
+    }
 
 
     @Override
@@ -50,6 +55,7 @@ public class OrdersFragment extends Fragment {
         View view = inflater.inflate(R.layout.fragment_orders, container, false);
 
         db = FirebaseFirestore.getInstance();
+        firebaseAuth = FirebaseAuth.getInstance();
 
         progressDialog = new ProgressDialog(getContext());
         progressDialog.setMessage("Please Wait...");
@@ -69,57 +75,50 @@ public class OrdersFragment extends Fragment {
         return view;
     }
 
-    private void fetchOrders(){
+    private void fetchOrders() {
 
+        CollectionReference orderRef = db.collection("mo_orders");
+        Query query = orderRef.whereEqualTo("order_customer_id", firebaseAuth.getCurrentUser().getUid());
+        query.get()
+                .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+                    @Override
+                    public void onComplete(@NonNull Task<QuerySnapshot> task) {
+                        if (task.isSuccessful()) {
+                            if (!task.getResult().getDocuments().isEmpty()) {
+                                for (DocumentSnapshot snapshot : task.getResult()) {
+                                    ChashiOrdersModel chashiOrdersModel = new ChashiOrdersModel();
+                                    chashiOrdersModel.setO_uid(snapshot.getString("order_id"));
+                                    chashiOrdersModel.setO_p_category(snapshot.getString("order_product"));
+                                    chashiOrdersModel.setO_customer_uid(snapshot.getString("order_customer_id"));
+                                    chashiOrdersModel.setO_chashi_uid(snapshot.getString("order_chashi_id"));
+                                    chashiOrdersModel.setO_chashi_name(snapshot.getString("order_chashi_name"));
+                                    chashiOrdersModel.setO_chashi_photo(snapshot.getString("order_product_image"));
+                                    chashiOrdersModel.setO_rate(snapshot.getString("order_rate"));
+                                    chashiOrdersModel.setO_quantity(snapshot.getString("order_quantity"));
+                                    chashiOrdersModel.setO_total(snapshot.getString("order_chashi_amount"));
+                                    chashiOrdersModel.setO_status(snapshot.getString("order_status"));
+                                    chashiOrdersModelList.add(chashiOrdersModel);
+                                }
+                                progressDialog.dismiss();
+                                chashiOrderAdapter = new ChashiOrderAdapter(getContext(), chashiOrdersModelList);
+                                recyclerOrders.setAdapter(chashiOrderAdapter);
 
-        Query queryOrders = db.collection("chashi_orders");
-        queryOrders.whereEqualTo("o_customer_uid", profile.getString("p_uid", "")).get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
-            @Override
-            public void onComplete(@NonNull Task<QuerySnapshot> task) {
-                if (task.isSuccessful()){
-                    if (task.getResult() != null){
-                        chashiOrdersModelList.clear();
-                        for (DocumentSnapshot document : task.getResult()){
-                            ChashiOrdersModel chashiOrdersModel = new ChashiOrdersModel();
-                            chashiOrdersModel.setO_timestamp(document.getString("o_timestamp"));
-                            chashiOrdersModel.setO_uid(document.getString("o_uid"));
-                            chashiOrdersModel.setO_p_uid(document.getString("o_p_uid"));
-                            chashiOrdersModel.setO_p_category(document.getString("o_p_category"));
-                            chashiOrdersModel.setO_customer_uid(document.getString("o_customer_uid"));
-                            chashiOrdersModel.setO_customer_name(document.getString("o_customer_name"));
-                            chashiOrdersModel.setO_customer_address(document.getString("o_customer_address"));
-                            chashiOrdersModel.setO_chashi_uid(document.getString("o_chashi_uid"));
-                            chashiOrdersModel.setO_chashi_name(document.getString("o_chashi_name"));
-                            chashiOrdersModel.setO_chashi_photo(document.getString("o_chashi_photo"));
-                            chashiOrdersModel.setO_chashi_address(document.getString("o_chashi_address"));
-                            chashiOrdersModel.setO_chashi_rating(document.getString("o_chashi_rating"));
-                            chashiOrdersModel.setO_rate(document.getString("o_rate"));
-                            chashiOrdersModel.setO_quantity(document.getString("o_quantity"));
-                            chashiOrdersModel.setO_shipping(document.getString("o_shipping"));
-                            chashiOrdersModel.setO_total(document.getString("o_total"));
-                            chashiOrdersModel.setO_homedelivery(document.getString("o_homedelivery"));
-                            chashiOrdersModel.setO_pickup(document.getString("o_pickup"));
-                            chashiOrdersModel.setO_status(document.getString("o_status"));
-                            chashiOrdersModel.setO_unit(document.getString("o_unit"));
-                            chashiOrdersModelList.add(chashiOrdersModel);
+                            } else {
+                                progressDialog.dismiss();
+                                txtNoOrders.setVisibility(View.VISIBLE);
+                                recyclerOrders.setVisibility(View.INVISIBLE);
+
+                            }
+
+                        } else {
+                            progressDialog.dismiss();
+                            Toast.makeText(getContext(), ""+task.getException().getMessage(), Toast.LENGTH_SHORT).show();
                         }
 
-                        chashiOrderAdapter = new ChashiOrderAdapter(getContext(), chashiOrdersModelList);
-                        recyclerOrders.setAdapter(chashiOrderAdapter);
-                        chashiOrderAdapter.notifyDataSetChanged();
-                        if (chashiOrdersModelList.isEmpty()){
-                            txtNoOrders.setVisibility(View.VISIBLE);
-                        }else {
-                            txtNoOrders.setVisibility(View.GONE);
-                        }
-                        progressDialog.dismiss();
                     }
-                }else {
-                    Toast.makeText(getContext(), "Database Error", Toast.LENGTH_SHORT).show();
+                    });
+
                 }
-            }
-        });
+
 
     }
-
-}
